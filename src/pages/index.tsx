@@ -6,9 +6,10 @@ import Navigation from "../../components/NavBar";
 import { CSSProperties, useEffect, useState } from "react";
 import NFT from "../../../../artifacts/contracts/AINFT.sol/NFT.json";
 import config from "../../config.json";
+import { providers, Contract } from "ethers";
 import axios from "axios";
-import process from "process";
 import { ethers } from "ethers";
+import process from "process";
 import ClipLoader from "react-spinners/ClipLoader";
 import { log } from "console";
 const Home: NextPage = () => {
