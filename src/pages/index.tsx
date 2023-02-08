@@ -2,9 +2,11 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import { NFTStorage, File } from "nft.storage";
 import Image from "next/image";
+import { Network, Alchemy } from "alchemy-sdk";
 import Navigation from "../../components/NavBar";
 import { CSSProperties, useEffect, useState } from "react";
-import NFT from "../../../../artifacts/contracts/AINFT.sol/NFT.json";
+import { IpfsImage } from "react-ipfs-image";
+// import NFT from "../../../../artifacts/contracts/AINFT.sol/NFT.json";
 import config from "../../config.json";
 import { providers, Contract } from "ethers";
 import axios from "axios";
@@ -13,7 +15,6 @@ import process from "process";
 import ClipLoader from "react-spinners/ClipLoader";
 import { log } from "console";
 const Home: NextPage = () => {
-  const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
   const URL =
     "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2";
   const [provider, setProvider] = useState<any>();
@@ -26,44 +27,477 @@ const Home: NextPage = () => {
   const [totalNft, setTotalNft] = useState<any>();
   const [message, setMessage] = useState("");
   const [isWaiting, setIsWaiting] = useState(false);
+
+  const setting: any = {
+    network: "eth-goerli",
+    apiKey: "Xve7HjU7nIupIDJUd1zI22dH7yVXxL6Y",
+  };
+
   const loadBlockchain = async () => {
-    const provider = new ethers.providers.AlchemyProvider(
-      "goerli",
-      "Xve7HjU7nIupIDJUd1zI22dH7yVXxL6Y"
-    );
+    console.log(account);
+    const alchemy = new Alchemy(setting);
+    // const provider = await alchemy.config.getProvider();
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
     setProvider(provider);
-    console.log(provider);
-
-    const network = await provider.getNetwork();
+    // // console.log(provider);s
+    const signer = new ethers.providers.Web3Provider(
+      window.ethereum
+    ).getSigner();
+    const network = await signer.getChainId();
     console.log(network);
-
-    const nft = new ethers.Contract(config[5].nft.address, NFT.abi, provider);
+    // const walletAddress = (await window.ethereum.enable())[0];
+    // console.log(walletAddress);
+    const nft = new ethers.Contract(
+      config[31337].nft.address,
+      [
+        {
+          inputs: [
+            {
+              internalType: "string",
+              name: "_name",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "_symbol",
+              type: "string",
+            },
+            {
+              internalType: "uint256",
+              name: "_cost",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "nonpayable",
+          type: "constructor",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "address",
+              name: "owner",
+              type: "address",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "approved",
+              type: "address",
+            },
+            {
+              indexed: true,
+              internalType: "uint256",
+              name: "tokenId",
+              type: "uint256",
+            },
+          ],
+          name: "Approval",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "address",
+              name: "owner",
+              type: "address",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "operator",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "bool",
+              name: "approved",
+              type: "bool",
+            },
+          ],
+          name: "ApprovalForAll",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "address",
+              name: "from",
+              type: "address",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "to",
+              type: "address",
+            },
+            {
+              indexed: true,
+              internalType: "uint256",
+              name: "tokenId",
+              type: "uint256",
+            },
+          ],
+          name: "Transfer",
+          type: "event",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "to",
+              type: "address",
+            },
+            {
+              internalType: "uint256",
+              name: "tokenId",
+              type: "uint256",
+            },
+          ],
+          name: "approve",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "owner",
+              type: "address",
+            },
+          ],
+          name: "balanceOf",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "cost",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "tokenId",
+              type: "uint256",
+            },
+          ],
+          name: "getApproved",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "owner",
+              type: "address",
+            },
+            {
+              internalType: "address",
+              name: "operator",
+              type: "address",
+            },
+          ],
+          name: "isApprovedForAll",
+          outputs: [
+            {
+              internalType: "bool",
+              name: "",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "string",
+              name: "tokenURI",
+              type: "string",
+            },
+          ],
+          name: "mint",
+          outputs: [],
+          stateMutability: "payable",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "name",
+          outputs: [
+            {
+              internalType: "string",
+              name: "",
+              type: "string",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "owner",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "tokenId",
+              type: "uint256",
+            },
+          ],
+          name: "ownerOf",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "from",
+              type: "address",
+            },
+            {
+              internalType: "address",
+              name: "to",
+              type: "address",
+            },
+            {
+              internalType: "uint256",
+              name: "tokenId",
+              type: "uint256",
+            },
+          ],
+          name: "safeTransferFrom",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "from",
+              type: "address",
+            },
+            {
+              internalType: "address",
+              name: "to",
+              type: "address",
+            },
+            {
+              internalType: "uint256",
+              name: "tokenId",
+              type: "uint256",
+            },
+            {
+              internalType: "bytes",
+              name: "data",
+              type: "bytes",
+            },
+          ],
+          name: "safeTransferFrom",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "operator",
+              type: "address",
+            },
+            {
+              internalType: "bool",
+              name: "approved",
+              type: "bool",
+            },
+          ],
+          name: "setApprovalForAll",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "bytes4",
+              name: "interfaceId",
+              type: "bytes4",
+            },
+          ],
+          name: "supportsInterface",
+          outputs: [
+            {
+              internalType: "bool",
+              name: "",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "symbol",
+          outputs: [
+            {
+              internalType: "string",
+              name: "",
+              type: "string",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "tokenId",
+              type: "uint256",
+            },
+          ],
+          name: "tokenURI",
+          outputs: [
+            {
+              internalType: "string",
+              name: "",
+              type: "string",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "totalSupply",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "from",
+              type: "address",
+            },
+            {
+              internalType: "address",
+              name: "to",
+              type: "address",
+            },
+            {
+              internalType: "uint256",
+              name: "tokenId",
+              type: "uint256",
+            },
+          ],
+          name: "transferFrom",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "withdraw",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+      ],
+      provider
+    );
     console.log(nft);
     setNft(nft);
     const balance = await provider.getBalance(nft.address);
-    console.log(balance.toString());
-
-    // const name = await nft.name();
-    // console.log(name);
+    // const name = await nft.cost();
+    // console.log(name.toString() / 10 ** 18);
     //
   };
 
+  const getOwner = async () => {
+    const owner = await nft.owner();
+    console.log(owner);
+  };
   const mintImage = async (tokenURI: any) => {
+    console.log(account);
+
     console.log("minting image...");
+    // const signer = new ethers.providers.Web3Provider(
+    //   window.ethereum
+    // ).getSigner();
+    const signer = await provider.getSigner(account);
+    console.log(signer);
 
-    const signer = await provider.getSigner();
-
-    const transaction = await nft
-      .connect(signer)
-      .mint(tokenURI, { value: ethers.utils.parseUnits("1", "ether") });
+    console.log(signer);
+    const transaction = await nft.connect(signer).mint(tokenURI, {
+      value: ethers.utils.parseUnits("1", "ether"),
+    });
     await transaction.wait();
+    console.log(transaction);
   };
 
-  const getTotalCreatedNft = async () => {
-    const totalSupply = await nft.totalSupply();
+  const getAddressOfNFT = async () => {
+    const totalSupply = await nft.tokenURI(1);
     console.log(totalSupply);
-    const number: any = totalSupply._hex;
-    setTotalNft(number);
+    // const number: any = totalSupply._hex;
+    // setTotalNft(number);
   };
 
   const submitHandler = async (e: any) => {
@@ -176,7 +610,6 @@ const Home: NextPage = () => {
               setDescription(e.target.value);
             }}
           ></input>
-          dadada
           <input
             className="border-[black] border-[1px] rounded-[6px] w-full  text-[20px] bg-[#6447e3] text-[#f1e8e8] h-[45px]"
             type="submit"
@@ -204,11 +637,16 @@ const Home: NextPage = () => {
       <div className="text-[20px] text-[red]">{totalNft}</div>
       <button
         onClick={() => {
-          getTotalCreatedNft();
+          getAddressOfNFT();
         }}
       >
         click
       </button>
+      <img src="https://ipfs.io/ipfs/QmQqzMTavQgT4f4T5v6PWBp7XNKtoPmC9jvn12WPT3gkSE" />
+      {/* <IpfsImage
+        hash="bafybeigxnjiqcc3gaz55nebavse2bwutzm5lv76ttxw422lwz5rhcgofuy"
+        // gatewayUrl="https://ipfs.infura.io/ipfs"
+      /> */}
     </div>
   );
 };

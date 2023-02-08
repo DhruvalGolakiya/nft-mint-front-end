@@ -6,6 +6,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "alchemy-sdk": "^2.4.2",
     "axios": "^1.3.2",
     "dotenv": "^16.0.3",
     "ethers": "^5.7.2",
@@ -13,6 +14,7 @@
     "nft.storage": "^7.0.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-ipfs-image": "^0.7.0",
     "react-spinners": "^0.13.8"
   },
   "devDependencies": {
